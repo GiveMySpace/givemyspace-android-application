@@ -3,15 +3,11 @@ package sandhoorahoaldings.lk.system;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONException;
-
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
@@ -58,10 +54,10 @@ public class SendLocation extends AsyncTask<String, String, String> {
             }
             JsonResponse = buffer.toString();
 //response data
-            Log.i(TAG,JsonResponse);
+            Log.i(TAG, JsonResponse);
 //send to post execute
-                return JsonResponse;
-            } catch (IOException e) {
+            return JsonResponse;
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {

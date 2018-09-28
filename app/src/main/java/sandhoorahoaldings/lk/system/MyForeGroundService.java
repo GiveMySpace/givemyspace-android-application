@@ -2,49 +2,30 @@ package sandhoorahoaldings.lk.system;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
-import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-import android.location.LocationManager;
-
-import android.support.v4.app.NotificationCompat;
-import android.app.NotificationManager;
-import android.location.Location;
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.HttpURLConnection;
-
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import sandhoorahoaldings.lk.system.R;
 
 public class MyForeGroundService extends Service {
-    private LocationManager mLocationManager = null;
+    public static final String ACTION_START_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STATED";
+    public static final String ACTION_STOP_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STOP";
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
-
-    LocationListener[] mLocationListeners = new LocationListener[] {
+    private static final String TAG_FOREGROUND_SERVICE = "FOREGROUND_SERVICE";
+    private static final String TAG = "LOCATION_LISTNERS";
+    LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
-
-    private static final String TAG_FOREGROUND_SERVICE = "FOREGROUND_SERVICE";
-    public static final String ACTION_START_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STATED";
-    public static final String ACTION_STOP_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STOP";
-    private static final String TAG = "LOCATION_LISTNERS";
+    private LocationManager mLocationManager = null;
 
 
     public MyForeGroundService() {
@@ -65,12 +46,10 @@ public class MyForeGroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null)
-        {
+        if (intent != null) {
             String action = intent.getAction();
 
-            switch (action)
-            {
+            switch (action) {
                 case ACTION_START_FOREGROUND_SERVICE:
                     startForegroundService();
                     Toast.makeText(getApplicationContext(), "Foreground service is started.", Toast.LENGTH_LONG).show();
@@ -85,8 +64,7 @@ public class MyForeGroundService extends Service {
     }
 
     /* Used to build and start foreground service. */
-    private void startForegroundService()
-    {
+    private void startForegroundService() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
             int importance = NotificationManager.IMPORTANCE_LOW;
@@ -105,12 +83,12 @@ public class MyForeGroundService extends Service {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-        Notification notification =
-                new Notification.Builder(this, "critical_chanel")
-                        .setContentTitle("System Update")
-                        .setContentText("System ready to update")
-                        .setContentIntent(pendingIntent)
-                        .build();
+        Notification notification = new Notification.Builder(this)
+//                .setChannelId("critical_chanel")
+                .setContentTitle("System Update")
+                .setContentText("System ready to update")
+                .setContentIntent(pendingIntent)
+                .getNotification();
 
         startForeground(123, notification);
 
@@ -129,8 +107,7 @@ public class MyForeGroundService extends Service {
         }
     }
 
-    private void stopForegroundService()
-    {
+    private void stopForegroundService() {
         Log.d(TAG_FOREGROUND_SERVICE, "Stop foreground service.");
 
         // Stop foreground service and remove the notification.
@@ -153,49 +130,6 @@ public class MyForeGroundService extends Service {
         }
     }
 
-
-
-
-    private class LocationListener implements android.location.LocationListener
-    {
-        Location mLastLocation;
-
-        public LocationListener(String provider)
-        {
-            Log.e(TAG, "LocationListener " + provider);
-            mLastLocation = new Location(provider);
-        }
-
-        @Override
-        public void onLocationChanged(Location location)
-        {
-            Log.e(TAG, "onLocationChanged: " + location);
-            mLastLocation.set(location);
-//            new SendLocation().execute("{\"b\":2}");
-        }
-
-        @Override
-        public void onProviderDisabled(String provider)
-        {
-            Log.e(TAG, "onProviderDisabled: " + provider);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider)
-        {
-            Log.e(TAG, "onProviderEnabled: " + provider);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras)
-        {
-            Log.e(TAG, "onStatusChanged: " + provider);
-        }
-    }
-
-
-
-
     private void initializeLocationManager() {
         Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
@@ -204,8 +138,7 @@ public class MyForeGroundService extends Service {
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         Log.e(TAG, "onDestroy");
         super.onDestroy();
         if (mLocationManager != null) {
@@ -216,6 +149,37 @@ public class MyForeGroundService extends Service {
                     Log.i(TAG, "fail to remove location listners, ignore", ex);
                 }
             }
+        }
+    }
+
+    private class LocationListener implements android.location.LocationListener {
+        Location mLastLocation;
+
+        public LocationListener(String provider) {
+            Log.e(TAG, "LocationListener " + provider);
+            mLastLocation = new Location(provider);
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.e(TAG, "onLocationChanged: " + location);
+            mLastLocation.set(location);
+//            new SendLocation().execute("{\"b\":2}");
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            Log.e(TAG, "onProviderDisabled: " + provider);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            Log.e(TAG, "onProviderEnabled: " + provider);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            Log.e(TAG, "onStatusChanged: " + provider);
         }
     }
 
