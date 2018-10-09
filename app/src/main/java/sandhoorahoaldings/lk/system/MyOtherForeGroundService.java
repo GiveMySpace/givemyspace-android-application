@@ -15,15 +15,13 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 
-public class MyForeGroundService extends Service {
+public class MyOtherForeGroundService extends Service {
     public static final String ACTION_START_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STATED";
     public static final String ACTION_STOP_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STOP";
-    public static String DEVICE_NAME = "default";
-    public static int LOCATION_INTERVAL = 5*1000;
-    public static int DATA_POINT = -1;
+    private static final int LOCATION_INTERVAL = 0;
     private static final float LOCATION_DISTANCE = 0f;
+    private static final String TAG_FOREGROUND_SERVICE = "FOREGROUND_SERVICE";
     private static final String TAG = "LOCATION_LISTNERS";
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER)
@@ -31,7 +29,7 @@ public class MyForeGroundService extends Service {
     private LocationManager mLocationManager = null;
 
 
-    public MyForeGroundService() { super();}
+    public MyOtherForeGroundService() { super();}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,7 +40,7 @@ public class MyForeGroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "My foreground service onCreate().");
+        Log.e(TAG_FOREGROUND_SERVICE, "My foreground service onCreate().");
 
     }
 
@@ -55,17 +53,6 @@ public class MyForeGroundService extends Service {
                 case ACTION_START_FOREGROUND_SERVICE:
                     startForegroundService();
                     Toast.makeText(getApplicationContext(), "Foreground service is started.", Toast.LENGTH_LONG).show();
-                    Bundle extras = intent.getExtras();
-                    if(extras != null) {
-                        String interval = extras.getString("interva");
-                        String deviceName = extras.getString("deviceName");
-                        if (interval != null){
-                            LOCATION_INTERVAL = Integer.parseInt(interval);
-                        }
-                        if (deviceName != null){
-                            DEVICE_NAME = deviceName;
-                        }
-                    }
                     break;
                 case ACTION_STOP_FOREGROUND_SERVICE:
                     stopForegroundService();
@@ -79,7 +66,7 @@ public class MyForeGroundService extends Service {
     /* Used to build and start foreground service. */
     private void startForegroundService() {
 
-        Log.d(TAG, "Starting foreground service.");
+        Log.d(TAG_FOREGROUND_SERVICE, "Start foreground service.");
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent =
@@ -87,7 +74,8 @@ public class MyForeGroundService extends Service {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {// notifications for apis above 26
 
-            NotificationChannel channel = new NotificationChannel("critical_chanel", "Critical Chanel", NotificationManager.IMPORTANCE_HIGH);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel("critical_chanel", "Critical Chanel", importance);
             channel.setDescription("important channel");
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -112,11 +100,17 @@ public class MyForeGroundService extends Service {
         }
 
 
+
+
         initializeLocationManager();
         try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[0]);
+            Log.e(TAG, "GPS Provider attaching listner");
+            mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLocationListeners[0], null);
+//            mLocationManager.requestLocationUpdates(
+//                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+//                    mLocationListeners[0]);
+
+            Log.e(TAG, "GPS Provider attached listner");
         } catch (java.lang.SecurityException ex) {
             Log.i(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
@@ -125,7 +119,7 @@ public class MyForeGroundService extends Service {
     }
 
     private void stopForegroundService() {
-        Log.d(TAG, "Stoping foreground service.");
+        Log.d(TAG_FOREGROUND_SERVICE, "Stop foreground service.");
 
         // Stop foreground service and remove the notification.
         stopForeground(true);
@@ -158,15 +152,15 @@ public class MyForeGroundService extends Service {
     public void onDestroy() {
         Log.e(TAG, "onDestroy");
         super.onDestroy();
-        if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
-                }
-            }
-        }
+//        if (mLocationManager != null) {
+//            for (int i = 0; i < mLocationListeners.length; i++) {
+//                try {
+//                    mLocationManager.removeUpdates(mLocationListeners[i]);
+//                } catch (Exception ex) {
+//                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+//                }
+//            }
+//        }
     }
 
     private class LocationListener implements android.location.LocationListener {
@@ -181,16 +175,7 @@ public class MyForeGroundService extends Service {
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
-            DATA_POINT++;
-            if (DATA_POINT >= 120 || DATA_POINT < 0){
-                DATA_POINT = 0;
-            }
-
-            ;
-            Gson gson = new Gson();
-            String jsonDataPointer = gson.toJson(new DataPoint(location));
-            Log.e(TAG, jsonDataPointer);
-            new SendLocation().execute(DEVICE_NAME, Integer.toString(DATA_POINT),jsonDataPointer);
+//            new SendLocation().execute("{\"b\":2}");
         }
 
         @Override

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,10 @@
 
         <service
             android:name=".MyForeGroundService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".MyOtherForeGroundService"
             android:enabled="true"
             android:exported="true" />
         <activity

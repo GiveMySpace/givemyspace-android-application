@@ -12,7 +12,7 @@ public class MyAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent i = new Intent(context, MyTestService.class);
-        i.putExtra("foo", "bar");
+        i.putExtra("interval",  intent.getBundleExtra("interval"));
         context.startService(i);
     }
 }
