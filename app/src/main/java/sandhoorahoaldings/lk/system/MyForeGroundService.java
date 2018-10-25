@@ -21,7 +21,7 @@ public class MyForeGroundService extends Service {
     public static final String ACTION_START_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STATED";
     public static final String ACTION_STOP_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STOP";
     public static String DEVICE_NAME = "default";
-    public static int LOCATION_INTERVAL = 5*1000;
+    public static int LOCATION_INTERVAL = 30*1000;
     public static int DATA_POINT = -1;
     private static final float LOCATION_DISTANCE = 0f;
     private static final String TAG = "LOCATION_LISTNERS";
@@ -60,7 +60,7 @@ public class MyForeGroundService extends Service {
                         String interval = extras.getString("interva");
                         String deviceName = extras.getString("deviceName");
                         if (interval != null){
-                            LOCATION_INTERVAL = Integer.parseInt(interval);
+                            LOCATION_INTERVAL = Integer.parseInt(interval)*1000;
                         }
                         if (deviceName != null){
                             DEVICE_NAME = deviceName;
