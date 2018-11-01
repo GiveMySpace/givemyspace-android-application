@@ -1,6 +1,8 @@
 package sandhoorahoaldings.lk.system;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.AlarmManager;
 import android.app.DialogFragment;
@@ -80,6 +82,14 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
             }
         });
 
+        Button alarmCheck = findViewById(R.id.alarmCheck);
+        alarmSet.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkAlarm();
+            }
+        });
+
 //        alarmOn.setEnabled(false);
 //        alarmOff.setEnabled(false);
         alarmSet.setEnabled(false);
@@ -147,7 +157,10 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
                 Log.e("ALARM TIMER", "ALARM SET");
                 Long next_alarm = alarminfo.getTriggerTime();
                 Log.e("ALARM TIMER", next_alarm.toString());
-                this.textView.setText("ALARM AT : " + next_alarm.toString());
+                Date date = new Date();
+                date.setTime(next_alarm);
+                String formattedDate=new SimpleDateFormat("YYYY, MM, DD, HH:MM").format(date);
+                this.textView.setText("ALARM AT : " + formattedDate);
             } else {
                 this.textView.setText("Alarm off");
             }
@@ -168,7 +181,7 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(System.currentTimeMillis());
         cal.clear();
-        cal.set(Integer.parseInt( year),Integer.parseInt(month),Integer.parseInt(day),Integer.parseInt(hour),Integer.parseInt(minute));
+        cal.set(Integer.parseInt( year),Integer.parseInt(month)-1,Integer.parseInt(day),Integer.parseInt(hour),Integer.parseInt(minute));
 
         // Construct an intent that will execute the AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
@@ -179,17 +192,25 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Setup periodic alarm every every half hour from this point onwards
-        //long firstMillis = System.currentTimeMillis(); // alarm is set right away
-        long firstMillis = cal.getTimeInMillis();
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+        //long firstMillis = cal.getTimeInMillis();
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {// if api level is above 21
             alarm.setExact(AlarmManager.RTC_WAKEUP, firstMillis, pIntent);
 
-            Long next_alarm = alarm.getNextAlarmClock().getTriggerTime();
-            Log.e("ALARM", "ALARM SET TO "+next_alarm.toString());
-            this.textView.setText("Alarm set to "+next_alarm.toString());
+//            Long next_alarm = alarm.getNextAlarmClock().getTriggerTime();
+            Date date = new Date();
+            date.setTime(firstMillis);
+            String formattedDate=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(date);
+            Log.e("ALARM", "ALARM SET TO "+formattedDate);
+//            Log.e("ALARM", year);
+//            Log.e("ALARM", month);
+//            Log.e("ALARM", day);
+//            Log.e("ALARM", hour);
+//            Log.e("ALARM", minute);
+            this.textView.setText("Alarm set to "+formattedDate);
         }
         else {
             this.textView.setText("Unsupported Android version");
@@ -213,4 +234,9 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
         startActivity(intent);
         Log.e("ala","sad");
     }
+
+    public void checkAlarm() {
+
+    }
 }
+
