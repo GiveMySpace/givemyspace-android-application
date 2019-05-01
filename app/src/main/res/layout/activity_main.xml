@@ -7,209 +7,107 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="291dp"
-        android:layout_height="43dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deviceNameTextField" />
-
-    <Button
-        android:id="@+id/start_foreground_service_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Start Foreground Service"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <Button
-        android:id="@+id/stop_foreground_service_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Stop Foreground Service"
-        app:layout_constraintTop_toBottomOf="@+id/start_foreground_service_button"
-        tools:layout_editor_absoluteX="16dp" />
-
-    <Button
-        android:id="@+id/alarmOn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Alarm On"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stop_foreground_service_button" />
-
-    <Button
-        android:id="@+id/alarmOff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Alarm Off"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alarmOn" />
-
 
     <EditText
         android:id="@+id/deviceNameTextField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
-        android:hint="Device Name"
         android:inputType="textPersonName"
-        android:text="defualt"
+        android:text="@string/default_device"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intervalTextField" />
-
-    <TextView
-        android:id="@+id/alarmTextView"
-        android:layout_width="105dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="Alarm not set"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/space2" />
-
-    <Button
-        android:id="@+id/alarmSet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="8dp"
-        android:text="SET ALARM"
-        app:layout_constraintEnd_toStartOf="@+id/space2"
-        app:layout_constraintTop_toBottomOf="@+id/alarmOff" />
+        app:layout_constraintTop_toBottomOf="@+id/intervalTextField"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/intervalTextField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:inputType="number"
-        android:text="5"
+        android:text="@string/default_interval"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateTextField" />
+        app:layout_constraintTop_toBottomOf="@+id/alarmText"
+        android:autofillHints="" />
 
-    <Space
-        android:id="@+id/space"
-        android:layout_width="16dp"
-        android:layout_height="34dp"
-        android:layout_marginEnd="8dp"
+    <TextView
+        android:id="@+id/alarmText"
+        android:layout_width="159dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.61"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/space2" />
 
-    <EditText
-        android:id="@+id/yearTextField"
-        android:layout_width="51dp"
-        android:layout_height="wrap_content"
+    <ToggleButton
+        android:id="@+id/alarmToggle"
+        android:layout_width="144dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="2018"
-        app:layout_constraintEnd_toStartOf="@+id/monthTextField"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
-
-    <EditText
-        android:id="@+id/monthTextField"
-        android:layout_width="31dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="11"
-        app:layout_constraintEnd_toStartOf="@+id/dateTextField"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
-
-    <EditText
-        android:id="@+id/dateTextField"
-        android:layout_width="33dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="1"
-        app:layout_constraintEnd_toStartOf="@+id/space"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
-
-    <EditText
-        android:id="@+id/hourTextField"
-        android:layout_width="34dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="21"
-        app:layout_constraintStart_toEndOf="@+id/space"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
-
-    <EditText
-        android:id="@+id/minuteTextField"
-        android:layout_width="34dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="10"
-        app:layout_constraintStart_toEndOf="@+id/hourTextField"
-        app:layout_constraintTop_toBottomOf="@+id/alarmTextView" />
-
-    <Button
-        android:id="@+id/alarmCheck"
-        android:layout_width="136dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:text="Check Alarm"
+        android:textOff="@string/alarmToggle_button_label_off"
+        android:textOn="@string/alarmToggle_button_label_on"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.073"
         app:layout_constraintStart_toEndOf="@+id/space2"
-        app:layout_constraintTop_toBottomOf="@+id/alarmOff" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TimePicker
+        android:id="@+id/alarmTimePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:ems="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/deviceNameTextField" />
+
+    <ToggleButton
+        android:id="@+id/serviceToggle"
+        android:layout_width="154dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:textOff="@string/serviceToggle_button_label_off"
+        android:textOn="@string/serviceToggle_button_label_on"
+        app:layout_constraintEnd_toStartOf="@+id/space2"
+        app:layout_constraintHorizontal_bias="0.907"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Space
         android:id="@+id/space2"
-        android:layout_width="20dp"
-        android:layout_height="13dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="7dp"
+        android:layout_height="42dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alarmOff" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

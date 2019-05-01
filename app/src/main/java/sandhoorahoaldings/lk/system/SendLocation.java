@@ -15,9 +15,9 @@ import java.net.URL;
 
 public class SendLocation extends AsyncTask<String, String, String> {
 
-    protected String doInBackground(String... params) {
+    String TAG = "Location Sender";
 
-        String TAG = "Location Sender";
+    protected String doInBackground(String... params) {
         String JsonResponse = null;
         String user = params[0];
         String dataPoint = params[1];
@@ -58,7 +58,7 @@ public class SendLocation extends AsyncTask<String, String, String> {
             }
             JsonResponse = buffer.toString();
 //response data
-            Log.i(TAG, JsonResponse);
+            Log.e(TAG, "Message sent");
 //send to post execute
             return JsonResponse;
         } catch (IOException e) {
@@ -71,19 +71,19 @@ public class SendLocation extends AsyncTask<String, String, String> {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
+                    Log.d(TAG, "Error closing stream", e);
                 }
             }
         }
 
-        return "a";
+        return "Error!";
     }
 
 //    protected void onProgressUpdate(Integer... progress) {
 //        setProgressPercent(progress[0]);
 //    }
 
-//    protected void onPostExecute(Long result) {
-//        showDialog("Downloaded " + result + " bytes");
-//    }
+    protected void onPostExecute(Long result) {
+        Log.e(TAG, "Message acknowledged");
+    }
 }

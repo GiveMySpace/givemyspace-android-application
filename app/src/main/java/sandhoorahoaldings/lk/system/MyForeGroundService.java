@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,11 +22,12 @@ public class MyForeGroundService extends Service {
     public static final String ACTION_START_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STATED";
     public static final String ACTION_STOP_FOREGROUND_SERVICE = "FOREGROUND_SERVICE_ACTION_STOP";
     public static String DEVICE_NAME = "default";
-    public static int LOCATION_INTERVAL = 2*60*1000;
+    public static int LOCATION_INTERVAL = 5*60*1000;
     public static int DATA_POINT = -1;
+    public static int DELAY = 0;
     private static final float LOCATION_DISTANCE = 0f;
-    private static final String TAG = "LOCATION_LISTNERS";
-    LocationListener[] mLocationListeners = new LocationListener[]{
+    private static final String TAG = "MyForeGroundService";
+    private LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER)
     };
     private LocationManager mLocationManager = null;
@@ -53,24 +55,34 @@ public class MyForeGroundService extends Service {
 
             switch (action) {
                 case ACTION_START_FOREGROUND_SERVICE:
-                    startForegroundService();
-                    Toast.makeText(getApplicationContext(), "Foreground service is started.", Toast.LENGTH_LONG).show();
                     Bundle extras = intent.getExtras();
                     if(extras != null) {
                         String interval = extras.getString("interval");
                         String deviceName = extras.getString("deviceName");
+                        String delay = extras.getString("delay");
                         if (interval != null){
                             LOCATION_INTERVAL = Integer.parseInt(interval)*60*1000;
-                            Log.e(TAG,Integer.toString(LOCATION_INTERVAL));
                         }
                         if (deviceName != null){
                             DEVICE_NAME = deviceName;
                         }
+                        if (delay != null){
+                            DELAY = Integer.parseInt(delay);
+                        }
                     }
+                    Log.e(TAG, "Update Interval : " + Integer.toString(LOCATION_INTERVAL));
+                    Log.e(TAG, "Update Interval in Minutes : " + Integer.toString(LOCATION_INTERVAL/(60*1000)));
+                    Log.e(TAG, "Delay : " + Integer.toString(DELAY));
+                    Log.e(TAG, "Delay in Minutes : " + Integer.toString(DELAY/(60*1000)));
+                    Log.e(TAG, "Device Name : " + DEVICE_NAME);
+
+                    startForegroundService();
+
+                    Toast.makeText(getApplicationContext(), "Foreground service started.", Toast.LENGTH_LONG).show();
                     break;
                 case ACTION_STOP_FOREGROUND_SERVICE:
                     stopForegroundService();
-                    Toast.makeText(getApplicationContext(), "Foreground service is stopped.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Foreground service stopped.", Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -80,7 +92,7 @@ public class MyForeGroundService extends Service {
     /* Used to build and start foreground service. */
     private void startForegroundService() {
 
-        Log.d(TAG, "Starting foreground service.");
+        Log.e(TAG, "Starting foreground service.");
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent =
@@ -97,36 +109,57 @@ public class MyForeGroundService extends Service {
 
             Notification notification = new Notification.Builder(this)
                     .setChannelId("critical_chanel")
-                    .setContentTitle("System Update")
-                    .setContentText("System ready to update")
+                    .setContentTitle("System Service")
+                    .setContentText("System caching")
                     .setContentIntent(pendingIntent)
                     .getNotification();
             startForeground(123, notification);
 
         } else {// notifications for apis below 26
             Notification notification = new Notification.Builder(this)
-                    .setContentTitle("System Update")
-                    .setContentText("System ready to update")
+                    .setContentTitle("System Service")
+                    .setContentText("System caching")
                     .setContentIntent(pendingIntent)
                     .getNotification();
             startForeground(123, notification);
         }
 
 
-        initializeLocationManager();
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[0]);
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
-        }
+        final MainActivity inst = MainActivity.instance();
+
+        inst.countDown = new CountDownTimer(DELAY, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int)millisUntilFinished/1000;
+                int secondsRemaining = seconds % 60;
+                int minutes = (seconds - secondsRemaining)/60;
+                int minutesRemaining = minutes % 60;
+                int hours = (minutes - minutesRemaining)/60;
+                inst.setAlarmText("Time remaining - " + hours + ":" + minutesRemaining + ":" + secondsRemaining);
+            }
+
+            public void onFinish() {
+                inst.setAlarmText("Service On");
+
+                initializeLocationManager();
+                try {
+                    mLocationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                            mLocationListeners[0]);
+                } catch (java.lang.SecurityException ex) {
+                    Log.d(TAG, "fail to request location update, ignore", ex);
+                } catch (IllegalArgumentException ex) {
+                    Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+                }
+            }
+        }.start();
+
+
+
     }
 
     private void stopForegroundService() {
-        Log.d(TAG, "Stoping foreground service.");
+        Log.e(TAG, "Stoping foreground service.");
 
         // Stop foreground service and remove the notification.
         stopForeground(true);
@@ -135,14 +168,13 @@ public class MyForeGroundService extends Service {
         stopSelf();
 
 
-        Log.e(TAG, "onDestroy");
         super.onDestroy();
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
                     mLocationManager.removeUpdates(mLocationListeners[i]);
                 } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    Log.d(TAG, "fail to remove location listners, ignore", ex);
                 }
             }
         }
@@ -164,7 +196,7 @@ public class MyForeGroundService extends Service {
                 try {
                     mLocationManager.removeUpdates(mLocationListeners[i]);
                 } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    Log.d(TAG, "fail to remove location listeners, ignore", ex);
                 }
             }
         }
@@ -172,6 +204,7 @@ public class MyForeGroundService extends Service {
 
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
+        String TAG = "LocationListener";
 
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);

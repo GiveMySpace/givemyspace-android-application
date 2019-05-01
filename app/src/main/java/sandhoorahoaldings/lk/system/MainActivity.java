@@ -20,223 +20,128 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.ToggleButton;
+import java.util.Calendar;
+import java.util.Timer;
+import android.os.CountDownTimer;
 
 public class MainActivity extends AppCompatActivity { // implements View.OnClickListener{
 
-    TextView textView ;
-    EditText deviceName ;
+    AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
+    private TimePicker alarmTimePicker;
+    private static MainActivity inst;
+    private TextView alarmTextView;
+    CountDownTimer countDown;
+
+    EditText deviceName;
     EditText interval;
-    EditText year;
-    EditText month;
-    EditText day;
-    EditText hour;
-    EditText minute;
+
+    ToggleButton alarmToggle;
+    ToggleButton serviceToggle;
+
+    public static MainActivity instance() {
+        return inst;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        inst = this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle("System Service");
+        this.alarmTimePicker = (TimePicker) findViewById(R.id.alarmTimePicker);
+        this.alarmTextView = (TextView) findViewById(R.id.alarmText);
+        this.alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        Button startServiceButton = findViewById(R.id.start_foreground_service_button);
-        startServiceButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startForeGroundService();
-            }
-        });
-
-        Button stopServiceButton = findViewById(R.id.stop_foreground_service_button);
-        stopServiceButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopForeGroundService();
-            }
-        });
-
-//        startServiceButton.setEnabled(false);
-//        stopServiceButton.setEnabled(false);
-
-        Button alarmOn = findViewById(R.id.alarmOn);
-        alarmOn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scheduleAlarm();
-            }
-        });
-
-        Button alarmOff = findViewById(R.id.alarmOff);
-        alarmOff.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelAlarm();
-            }
-        });
-
-        Button alarmSet = findViewById(R.id.alarmSet);
-        alarmSet.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAlarm();
-            }
-        });
-
-        Button alarmCheck = findViewById(R.id.alarmCheck);
-        alarmSet.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkAlarm();
-            }
-        });
-
-//        alarmOn.setEnabled(false);
-//        alarmOff.setEnabled(false);
-        alarmSet.setEnabled(false);
-
-
-        this.textView = findViewById(R.id.textView);
         this.deviceName = findViewById(R.id.deviceNameTextField);
         this.interval = findViewById(R.id.intervalTextField);
-        this.year = findViewById(R.id.yearTextField);
-        this.month = findViewById(R.id.monthTextField);
-        this.day = findViewById(R.id.dateTextField);
-        this.hour = findViewById(R.id.hourTextField);
-        this.minute = findViewById(R.id.minuteTextField);
 
+
+        this.alarmToggle = (ToggleButton) findViewById(R.id.alarmToggle);
+        this.alarmToggle.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAlarmToggleClicked(v);
+            }
+        });
+
+        this.serviceToggle = (ToggleButton) findViewById(R.id.serviceToggle);
+        this.serviceToggle.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onServiceToggleClicked(v);
+            }
+        });
 
         ActivityCompat.requestPermissions(this, new String[]{"android.permission.FOREGROUND_SERVICE",
                 "android.permission.INTERNET",
                 "android.permission.ACCESS_FINE_LOCATION",
                 "android.permission.ACCESS_NETWORK_STATE"}, 123);
-
-        initializeForeGroundService();
-
-
-//        initializeAlarm();
-
     }
 
-    public void initializeForeGroundService() {
-//
-//        Log.e("MANINACTIVITY", "Sending Location");
-//        new SendLocation().execute("a","a","{\"a\":\"15\"}");
-//        Log.e("MANINACTIVITY", "Location Sent");
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
-    public void startForeGroundService() {
+
+    public void onAlarmToggleClicked(View view) {
+        if (((ToggleButton) view).isChecked()) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
+            calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
+            Calendar calendarNow = Calendar.getInstance();
+            final int DelayInMiliSeconds = Math.abs((int)(calendar.getTimeInMillis() - calendarNow.getTimeInMillis()));
+
+            startForeGroundService(DelayInMiliSeconds);
+
+        } else {
+            stopForeGroundService();
+            this.countDown.cancel();
+            setAlarmText("Service Off");
+            Log.e("MyActivity", "Alarm Off");
+        }
+    }
+
+    public void onServiceToggleClicked(View view) {
+        if (((ToggleButton) view).isChecked()) {
+            Log.e("MyActivity", "Service On");
+            startForeGroundService(0);
+        } else {
+            stopForeGroundService();
+            setAlarmText("Service Off");
+            Log.e("MyActivity", "Service Off");
+        }
+    }
+
+    public void setAlarmText(String alarmText) {
+        alarmTextView.setText(alarmText);
+    }
+
+
+    public void startForeGroundService(int delay) {
         String device = this.deviceName.getText().toString();
         String interval = this.interval.getText().toString();
         Intent intent = new Intent(MainActivity.this, MyForeGroundService.class);
         intent.putExtra("deviceName", device);
         intent.putExtra("interval", interval);
+        intent.putExtra("delay", Integer.toString(delay));
         intent.setAction(MyForeGroundService.ACTION_START_FOREGROUND_SERVICE);
-//                Intent intent = new Intent(MainActivity.this, MyOtherForeGroundService.class);
-//                intent.setAction(MyOtherForeGroundService.ACTION_START_FOREGROUND_SERVICE);
         startService(intent);
     }
 
     public void stopForeGroundService() {
         Intent intent = new Intent(MainActivity.this, MyForeGroundService.class);
         intent.setAction(MyForeGroundService.ACTION_STOP_FOREGROUND_SERVICE);
-//                Intent intent = new Intent(MainActivity.this, MyOtherForeGroundService.class);
-//                intent.setAction(MyOtherForeGroundService.ACTION_STOP_FOREGROUND_SERVICE);
         startService(intent);
     }
 
-    public void initializeAlarm() {
-        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            AlarmManager.AlarmClockInfo alarminfo = alarm.getNextAlarmClock();
-
-            if(alarminfo != null) {
-                Log.e("ALARM TIMER", "ALARM SET");
-                Long next_alarm = alarminfo.getTriggerTime();
-                Log.e("ALARM TIMER", next_alarm.toString());
-                Date date = new Date();
-                date.setTime(next_alarm);
-                String formattedDate=new SimpleDateFormat("YYYY, MM, DD, HH:MM").format(date);
-                this.textView.setText("ALARM AT : " + formattedDate);
-            } else {
-                this.textView.setText("Alarm off");
-            }
-        } else {
-            this.textView.setText("Unsupported Android version");
-        }
-    }
-
-    public void scheduleAlarm() {
-        String interval = this.interval.getText().toString();
-        String device = this.deviceName.getText().toString();
-        String year = this.year.getText().toString();
-        String month = this.month.getText().toString();
-        String day = this.day.getText().toString();
-        String hour = this.hour.getText().toString();
-        String minute = this.minute.getText().toString();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-        cal.clear();
-        cal.set(Integer.parseInt( year),Integer.parseInt(month)-1,Integer.parseInt(day),Integer.parseInt(hour),Integer.parseInt(minute));
-
-        // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-        intent.putExtra("deviceName", device);
-        intent.putExtra("interval", interval);
-        // Create a PendingIntent to be triggered when the alarm goes off
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Setup periodic alarm every every half hour from this point onwards
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
-        //long firstMillis = cal.getTimeInMillis();
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {// if api level is above 21
-            alarm.setExact(AlarmManager.RTC_WAKEUP, firstMillis, pIntent);
-
-//            Long next_alarm = alarm.getNextAlarmClock().getTriggerTime();
-            Date date = new Date();
-            date.setTime(firstMillis);
-            String formattedDate=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(date);
-            Log.e("ALARM", "ALARM SET TO "+formattedDate);
-//            Log.e("ALARM", year);
-//            Log.e("ALARM", month);
-//            Log.e("ALARM", day);
-//            Log.e("ALARM", hour);
-//            Log.e("ALARM", minute);
-            this.textView.setText("Alarm set to "+formattedDate);
-        }
-        else {
-            this.textView.setText("Unsupported Android version");
-        }
-
-
-
-    }
-
-    public void cancelAlarm() {
-        Intent intent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.cancel(pIntent);
-        this.textView.setText("Alarm is off");
-    }
-
-    public void setAlarm() {
-        Intent intent = new Intent(MainActivity.this, TimePicker.class);
-        startActivity(intent);
-        Log.e("ala","sad");
-    }
-
-    public void checkAlarm() {
-
-    }
 }
 
