@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -53,6 +55,12 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+
         setContentView(R.layout.activity_main);
 
         this.alarmTimePicker = (TimePicker) findViewById(R.id.alarmTimePicker);
@@ -79,10 +87,12 @@ public class MainActivity extends AppCompatActivity { // implements View.OnClick
             }
         });
 
-        ActivityCompat.requestPermissions(this, new String[]{"android.permission.FOREGROUND_SERVICE",
+        ActivityCompat.requestPermissions(this, new String[]{
+                "android.permission.FOREGROUND_SERVICE",
                 "android.permission.INTERNET",
                 "android.permission.ACCESS_FINE_LOCATION",
-                "android.permission.ACCESS_NETWORK_STATE"}, 123);
+                "android.permission.ACCESS_NETWORK_STATE",
+                "android.permission.WAKE_LOCK"}, 123);
     }
 
 

@@ -12,54 +12,42 @@
         android:id="@+id/deviceNameTextField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:autofillHints=""
         android:ems="10"
         android:inputType="textPersonName"
         android:text="@string/default_device"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/space"
+        app:layout_constraintHorizontal_bias="0.553"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intervalTextField"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/alarmText" />
 
     <EditText
         android:id="@+id/intervalTextField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:autofillHints=""
         android:ems="10"
         android:inputType="number"
         android:text="@string/default_interval"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alarmText"
-        android:autofillHints="" />
+        app:layout_constraintStart_toEndOf="@+id/space"
+        app:layout_constraintTop_toBottomOf="@+id/alarmText" />
 
     <TextView
         android:id="@+id/alarmText"
-        android:layout_width="159dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/space2" />
+        app:layout_constraintTop_toBottomOf="@+id/alarmToggle" />
 
     <ToggleButton
         android:id="@+id/alarmToggle"
-        android:layout_width="144dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="145dp"
+        android:layout_height="34dp"
         android:textOff="@string/alarmToggle_button_label_off"
         android:textOn="@string/alarmToggle_button_label_on"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,27 +57,22 @@
 
     <TimePicker
         android:id="@+id/alarmTimePicker"
+        style="@android:style/Widget.Material.TimePicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:ems="10"
+        android:verticalScrollbarPosition="right"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deviceNameTextField" />
+        app:layout_constraintTop_toBottomOf="@+id/intervalTextField"
+        tools:visibility="visible" />
 
     <ToggleButton
         android:id="@+id/serviceToggle"
-        android:layout_width="154dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="160dp"
+        android:layout_height="34dp"
         android:textOff="@string/serviceToggle_button_label_off"
         android:textOn="@string/serviceToggle_button_label_on"
         app:layout_constraintEnd_toStartOf="@+id/space2"
@@ -99,15 +82,18 @@
 
     <Space
         android:id="@+id/space2"
-        android:layout_width="7dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="11dp"
+        android:layout_height="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Space
+        android:id="@+id/space"
+        android:layout_width="22dp"
+        android:layout_height="29dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/alarmText" />
 
 </android.support.constraint.ConstraintLayout>
